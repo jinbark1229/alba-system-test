@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>사장님: 데이터 내보내기</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts & Material Symbols -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2b8cee",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "Noto Sans KR", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for webkit browsers */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased overflow-hidden">
+<div class="flex h-screen w-full overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-[280px] bg-white dark:bg-[#1a2632] border-r border-slate-200 dark:border-slate-800 flex flex-col shrink-0 transition-all duration-300 hidden lg:flex h-full">
+<div class="flex h-full flex-col justify-between p-4">
+<div class="flex flex-col gap-8">
+<!-- User Profile -->
+<div class="flex items-center gap-3 px-2">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-12 shadow-sm border border-slate-100 dark:border-slate-700" data-alt="Profile picture of the business owner" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCIehXhCdx13dTtwoYOgxsEi1LKaH3jA1_J5tf0gr7E_-Z-PlZ0X50I32O4McLOSuc2kxXRjRwy8Hbwb1Aj9G7S2Ugf-iZAUTRwSVuSjPhLvfKXQlBfnZtWNgF8Vy4Crj6ggQoG1IkQSUylo3iB-t-DZZy0c3CgUW6Al52SvVpGBrDa5zOtDkBgyGNr4O2OBZ1aJnLeeT55S33j4YC0rpB9iqAON7sOwBct1hcndp3h6IXHXNdECJf_TrXwqworr4j4ZbxYh4lIrtI");'></div>
+<div class="flex flex-col">
+<h1 class="text-slate-900 dark:text-white text-base font-bold leading-normal">김사장님</h1>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-normal leading-normal">맛있는 카페 (서울점)</p>
+</div>
+</div>
+<!-- Navigation -->
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 group transition-colors" href="#">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary transition-colors" style="font-size: 24px;">home</span>
+<p class="text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal group-hover:text-primary transition-colors">홈</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 group transition-colors" href="#">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary transition-colors" style="font-size: 24px;">calendar_month</span>
+<p class="text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal group-hover:text-primary transition-colors">근무 일정</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 group transition-colors" href="#">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary transition-colors" style="font-size: 24px;">attach_money</span>
+<p class="text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal group-hover:text-primary transition-colors">급여 관리</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 group transition-colors" href="#">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary transition-colors" style="font-size: 24px;">group</span>
+<p class="text-slate-700 dark:text-slate-300 text-sm font-medium leading-normal group-hover:text-primary transition-colors">직원 목록</p>
+</a>
+<div class="my-2 border-t border-slate-100 dark:border-slate-800"></div>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 dark:bg-primary/20 text-primary" href="#">
+<span class="material-symbols-outlined fill-current" style="font-size: 24px;">settings</span>
+<p class="text-sm font-semibold leading-normal">설정</p>
+</a>
+</nav>
+</div>
+<!-- Footer/Logout -->
+<div class="px-2">
+<button class="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 group transition-colors">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-red-500 transition-colors" style="font-size: 24px;">logout</span>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium leading-normal group-hover:text-red-500 transition-colors">로그아웃</p>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col h-full overflow-hidden bg-background-light dark:bg-background-dark relative">
+<!-- Header / Breadcrumbs -->
+<header class="shrink-0 px-6 py-5 lg:px-12 lg:py-8">
+<div class="max-w-[1000px] mx-auto w-full">
+<!-- Breadcrumbs -->
+<div class="flex flex-wrap gap-2 items-center mb-4 text-sm">
+<a class="text-slate-500 dark:text-slate-400 hover:text-primary font-medium" href="#">홈</a>
+<span class="text-slate-400 dark:text-slate-600 font-medium">/</span>
+<a class="text-slate-500 dark:text-slate-400 hover:text-primary font-medium" href="#">설정</a>
+<span class="text-slate-400 dark:text-slate-600 font-medium">/</span>
+<span class="text-slate-900 dark:text-slate-100 font-semibold">데이터 내보내기</span>
+</div>
+<!-- Page Heading -->
+<div class="flex flex-col gap-2">
+<h1 class="text-slate-900 dark:text-white text-3xl lg:text-4xl font-black leading-tight tracking-tight">데이터 내보내기</h1>
+<p class="text-slate-500 dark:text-slate-400 text-base lg:text-lg font-normal max-w-2xl">직원들의 근무 기록과 급여 내역을 선택한 기간에 맞춰 CSV 파일로 다운로드합니다.</p>
+</div>
+</div>
+</header>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto px-6 pb-20 lg:px-12">
+<div class="max-w-[1000px] mx-auto w-full flex flex-col gap-8">
+<!-- Main Action Card -->
+<div class="bg-white dark:bg-[#1e2936] rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+<!-- Date Picker Section -->
+<div class="p-6 border-b border-slate-100 dark:border-slate-700">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">date_range</span>
+                                기간 선택
+                            </h2>
+<div class="flex gap-2">
+<span class="text-xs font-medium px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">오늘</span>
+<span class="text-xs font-medium px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">이번 달</span>
+<span class="text-xs font-medium px-2 py-1 rounded bg-primary/10 text-primary">지난 달</span>
+</div>
+</div>
+<!-- Calendar Grid -->
+<div class="flex flex-wrap lg:flex-nowrap justify-center gap-8 lg:gap-12">
+<!-- Month 1 -->
+<div class="flex min-w-[280px] flex-1 flex-col gap-2">
+<div class="flex items-center justify-between px-2 pb-2">
+<button class="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-white" style="font-size: 20px;">chevron_left</span>
+</button>
+<p class="text-slate-900 dark:text-white text-base font-bold">2023년 10월</p>
+<div class="w-8"></div> <!-- spacer -->
+</div>
+<div class="grid grid-cols-7 gap-y-1">
+<!-- Days Header -->
+<div class="text-slate-400 text-xs font-bold text-center py-2">일</div>
+<div class="text-slate-400 text-xs font-bold text-center py-2">월</div>
+<div class="text-slate-400 text-xs font-bold text-center py-2">화</div>
+<div class="text-slate-400 text-xs font-bold text-center py-2">수</div>
+<div class="text-slate-400 text-xs font-bold text-center py-2">목</div>
+<div class="text-slate-400 text-xs font-bold text-center py-2">금</div>
+<div class="text-slate-400 text-xs font-bold text-center py-2">토</div>
+<!-- Dates -->
+<!-- Empty slots for previous month -->
+<div class="h-10"></div><div class="h-10"></div><div class="h-10"></div>
+<!-- Days 1-4 -->
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">1</button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">2</button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">3</button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">4</button>
+<!-- Start Selection: Oct 5 -->
+<button class="relative h-10 w-full text-white text-sm font-semibold z-10">
+<div class="absolute inset-y-0 left-0 right-0 bg-primary/20 dark:bg-primary/30 rounded-l-full z-[-1] ml-1"></div> <!-- Range background start -->
+<div class="absolute inset-0 bg-primary rounded-full z-[-1] flex items-center justify-center shadow-md">5</div>
+</button>
+<!-- Range: Oct 6-31 -->
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">6</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">7</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30 rounded-r-full lg:rounded-none">8</button> <!-- Wrapping range edge case handling visually simplified -->
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30 rounded-l-full lg:rounded-none">9</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">10</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">11</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">12</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">13</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">14</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">15</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">16</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">17</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">18</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">19</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">20</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">21</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">22</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">23</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">24</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">25</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">26</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">27</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">28</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">29</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">30</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30 rounded-r-full">31</button>
+</div>
+</div>
+<!-- Divider (Mobile only) -->
+<div class="block lg:hidden w-full h-px bg-slate-100 dark:bg-slate-700"></div>
+<!-- Month 2 -->
+<div class="flex min-w-[280px] flex-1 flex-col gap-2">
+<div class="flex items-center justify-between px-2 pb-2">
+<div class="w-8"></div> <!-- spacer -->
+<p class="text-slate-900 dark:text-white text-base font-bold">2023년 11월</p>
+<button class="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-white" style="font-size: 20px;">chevron_right</span>
+</button>
+</div>
+<div class="grid grid-cols-7 gap-y-1">
+<div class="text-slate-400 text-xs font-bold text-center py-2">일</div>
+<div class="text-slate-400 text-xs font-bold text-center py-2">월</div>
+<div class="text-slate-400 text-xs font-bold text-center py-2">화</div>
+<div class="text-slate-400 text-xs font-bold text-center py-2">수</div>
+<div class="text-slate-400 text-xs font-bold text-center py-2">목</div>
+<div class="text-slate-400 text-xs font-bold text-center py-2">금</div>
+<div class="text-slate-400 text-xs font-bold text-center py-2">토</div>
+<!-- Empty slots -->
+<div class="h-10"></div><div class="h-10"></div><div class="h-10"></div>
+<!-- Range: Nov 1-6 -->
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30 rounded-l-full">1</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">2</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">3</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">4</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">5</button>
+<button class="h-10 w-full text-slate-900 dark:text-white text-sm bg-primary/20 dark:bg-primary/30">6</button>
+<!-- End Selection: Nov 7 -->
+<button class="relative h-10 w-full text-white text-sm font-semibold z-10">
+<div class="absolute inset-y-0 left-0 right-0 bg-primary/20 dark:bg-primary/30 rounded-r-full z-[-1] mr-1"></div> <!-- Range background end -->
+<div class="absolute inset-0 bg-primary rounded-full z-[-1] flex items-center justify-center shadow-md">7</div>
+</button>
+<!-- Remaining days -->
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">8</button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">9</button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">10</button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">11</button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">12</button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">13</button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">14</button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">15</button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">16</button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">17</button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">18</button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">19</button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">20</button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">21</button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">22</button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">23</button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">24</button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">25</button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">26</button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">27</button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">28</button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">29</button>
+<button class="h-10 w-full text-slate-700 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">30</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Stats & Action -->
+<div class="p-6 bg-slate-50 dark:bg-[#1a2632]">
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+<div class="flex flex-col gap-1 p-5 rounded-lg bg-white dark:bg-[#1e2936] border border-slate-200 dark:border-slate-700 shadow-sm">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">선택 기간</p>
+<p class="text-slate-900 dark:text-white text-lg font-bold">2023.10.05 - 11.07</p>
+</div>
+<div class="flex flex-col gap-1 p-5 rounded-lg bg-white dark:bg-[#1e2936] border border-slate-200 dark:border-slate-700 shadow-sm">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">총 일수</p>
+<div class="flex items-end gap-2">
+<p class="text-slate-900 dark:text-white text-2xl font-bold leading-none">34</p>
+<span class="text-slate-500 dark:text-slate-400 text-sm font-medium">일</span>
+</div>
+</div>
+<div class="flex flex-col gap-1 p-5 rounded-lg bg-white dark:bg-[#1e2936] border border-slate-200 dark:border-slate-700 shadow-sm">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">대상 직원</p>
+<div class="flex items-end gap-2">
+<p class="text-slate-900 dark:text-white text-2xl font-bold leading-none">12</p>
+<span class="text-slate-500 dark:text-slate-400 text-sm font-medium">명</span>
+</div>
+</div>
+</div>
+<!-- Action Area -->
+<div class="flex flex-col sm:flex-row items-center justify-between gap-6 pt-4 border-t border-slate-200 dark:border-slate-700">
+<div class="flex flex-col gap-1.5 max-w-md">
+<div class="flex items-center gap-2 text-slate-700 dark:text-slate-200 text-sm font-medium">
+<span class="material-symbols-outlined text-amber-500" style="font-size: 20px;">info</span>
+<span>주의사항</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
+                                    다운로드된 파일은 암호화되지 않았습니다. 개인정보(급여, 주민번호 등)가 포함되어 있으니 파일 관리에 유의해 주세요.
+                                </p>
+</div>
+<div class="flex items-center gap-3 w-full sm:w-auto">
+<div class="relative flex items-center">
+<select class="appearance-none bg-white dark:bg-[#1e2936] border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 py-3 pl-4 pr-10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent cursor-pointer font-medium h-[48px]">
+<option value="csv">CSV 파일 (.csv)</option>
+<option value="xlsx">엑셀 파일 (.xlsx)</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
+<span class="material-symbols-outlined" style="font-size: 20px;">expand_more</span>
+</div>
+</div>
+<button class="flex-1 sm:flex-none h-[48px] bg-primary hover:bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">download</span>
+<span>ZIP 내보내기</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent History Section -->
+<div class="flex flex-col gap-4">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white px-1">최근 내보내기 내역</h3>
+<div class="bg-white dark:bg-[#1e2936] rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-slate-100 dark:border-slate-700">
+<th class="py-4 px-6 text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">요청 일시</th>
+<th class="py-4 px-6 text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">조회 기간</th>
+<th class="py-4 px-6 text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">파일 형식</th>
+<th class="py-4 px-6 text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">상태</th>
+<th class="py-4 px-6 text-xs font-semibold uppercase text-slate-500 dark:text-slate-400 text-right">관리</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+<tr class="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="py-4 px-6 text-sm text-slate-900 dark:text-slate-200 font-medium">2023.11.08 14:30</td>
+<td class="py-4 px-6 text-sm text-slate-500 dark:text-slate-400">2023.10.01 - 10.31</td>
+<td class="py-4 px-6 text-sm text-slate-500 dark:text-slate-400">CSV</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                                완료
+                                            </span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="text-primary hover:text-blue-700 dark:hover:text-blue-400 text-sm font-medium hover:underline">재다운로드</button>
+</td>
+</tr>
+<tr class="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="py-4 px-6 text-sm text-slate-900 dark:text-slate-200 font-medium">2023.10.05 09:12</td>
+<td class="py-4 px-6 text-sm text-slate-500 dark:text-slate-400">2023.09.01 - 09.30</td>
+<td class="py-4 px-6 text-sm text-slate-500 dark:text-slate-400">Excel</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+                                                만료됨
+                                            </span>
+</td>
+<td class="py-4 px-6 text-right">
+<span class="text-slate-400 text-sm">-</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
