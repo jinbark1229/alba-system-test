@@ -1,5 +1,63 @@
 // src/services/api.ts
-import { supabase, type DbWorkLog, type DbSchedule, type DbNotice } from "../lib/supabase";
+
+// Helper function to safely parse localStorage
+const getStorage = <T,>(key: string, defaultValue: T): T => {
+    try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : defaultValue;
+    } catch {
+        return defaultValue;
+    }
+};
+
+const setStorage = <T,>(key: string, value: T) => {
+    localStorage.setItem(key, JSON.stringify(value));
+};
+
+// ============ Mock Data Initializers ============
+
+const initMockData = () => {
+    const today = new Date();
+    const formatDate = (date: Date) => date.toISOString().split('T')[0];
+    const todayStr = formatDate(today);
+
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = formatDate(yesterday);
+
+    if (!localStorage.getItem('alba_work_logs')) {
+        setStorage('alba_work_logs', [
+            { id: 'log1', date: todayStr, start: '09:00', end: '18:00', break: true, userName: '김철수', breakDuration: 60, note: '정상출근' },
+            { id: 'log2', date: yesterdayStr, start: '14:00', end: '22:00', break: true, userName: '이영희', breakDuration: 30, note: '물품 정리 완료' }
+        ]);
+    }
+
+    if (!localStorage.getItem('alba_schedules')) {
+        setStorage('alba_schedules', [
+            { id: 'sch1', name: '김철수', date: todayStr, start: '09:00', end: '18:00', storeId: 'store1' },
+            { id: 'sch2', name: '이영희', date: todayStr, start: '14:00', end: '22:00', storeId: 'store2' }
+        ]);
+    }
+
+    if (!localStorage.getItem('alba_notices')) {
+        setStorage('alba_notices', [
+            {
+                id: 'not1', title: '이번 주말 매장 청소 안내', content: '이번 주말 마감 타임은 창고 청소 부탁드립니다.',
+                author: '사장님', storeId: 'both', priority: 'important', imageUrls: [], createdAt: new Date().toISOString()
+            },
+            {
+                id: 'not2', title: '신메뉴 레시피 업데이트', content: '포스기 옆 레시피 북 업데이트 되었습니다. 확인해주세요.',
+                author: '사장님', storeId: 'store1', priority: 'normal', imageUrls: [], createdAt: new Date(Date.now() - 86400000).toISOString()
+            }
+        ]);
+    }
+
+    if (!localStorage.getItem('alba_comments')) {
+        setStorage('alba_comments', []);
+    }
+};
+
+initMockData();
 
 // ============ Work Logs ============
 export interface WorkLog {
@@ -14,67 +72,30 @@ export interface WorkLog {
 }
 
 export const createLog = async (log: { date: string; start: string; end: string; break: boolean; userName?: string; breakDuration?: number; note?: string }) => {
-    const { error } = await supabase
-        .from('work_logs')
-        .insert({
-            user_name: log.userName || '',
-            date: log.date,
-            start_time: log.start,
-            end_time: log.end,
-            break_duration: log.breakDuration || 0,
-            note: log.note || null
-        });
-
-    if (error) throw error;
+    const logs = getStorage<WorkLog[]>('alba_work_logs', []);
+    const newLog: WorkLog = {
+        ...log,
+        id: Math.random().toString(36).substr(2, 9),
+        userName: log.userName || '알 수 없음',
+    };
+    logs.unshift(newLog); // 최신을 앞에
+    setStorage('alba_work_logs', logs);
 };
 
 export const getLogs = async (userName: string): Promise<WorkLog[]> => {
-    const { data, error } = await supabase
-        .from('work_logs')
-        .select('*')
-        .eq('user_name', userName)
-        .order('date', { ascending: false });
-
-    if (error) throw error;
-
-    return (data || []).map((log: DbWorkLog) => ({
-        id: log.id,
-        date: log.date,
-        start: log.start_time,
-        end: log.end_time,
-        break: log.break_duration > 0,
-        userName: log.user_name,
-        breakDuration: log.break_duration,
-        note: log.note || undefined
-    }));
+    const logs = getStorage<WorkLog[]>('alba_work_logs', []);
+    return logs.filter(l => l.userName === userName).sort((a, b) => b.date.localeCompare(a.date));
 };
 
 export const getAllLogs = async (): Promise<WorkLog[]> => {
-    const { data, error } = await supabase
-        .from('work_logs')
-        .select('*')
-        .order('date', { ascending: false });
-
-    if (error) throw error;
-
-    return (data || []).map((log: DbWorkLog) => ({
-        id: log.id,
-        date: log.date,
-        start: log.start_time,
-        end: log.end_time,
-        break: log.break_duration > 0,
-        userName: log.user_name,
-        breakDuration: log.break_duration
-    }));
+    const logs = getStorage<WorkLog[]>('alba_work_logs', []);
+    return logs.sort((a, b) => b.date.localeCompare(a.date));
 };
 
 export const deleteLog = async (logId: string) => {
-    const { error } = await supabase
-        .from('work_logs')
-        .delete()
-        .eq('id', logId);
-
-    if (error) throw error;
+    let logs = getStorage<WorkLog[]>('alba_work_logs', []);
+    logs = logs.filter(l => l.id !== logId);
+    setStorage('alba_work_logs', logs);
 };
 
 // ============ Schedules ============
@@ -87,23 +108,9 @@ export interface Schedule {
     storeId?: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const getSchedules = async (_userName: string): Promise<Schedule[]> => {
-    const { data, error } = await supabase
-        .from('schedules')
-        .select('*')
-        .order('date', { ascending: true });
-
-    if (error) throw error;
-
-    return (data || []).map((s: DbSchedule) => ({
-        id: s.id,
-        name: s.name,
-        date: s.date,
-        start: s.start_time,
-        end: s.end_time,
-        storeId: s.store_id
-    }));
+export const getSchedules = async (_userName?: string): Promise<Schedule[]> => {
+    const schedules = getStorage<Schedule[]>('alba_schedules', []);
+    return schedules.sort((a, b) => a.date.localeCompare(b.date));
 };
 
 export const uploadSchedules = async (file: File, storeId: string): Promise<void> => {
@@ -132,12 +139,8 @@ export const uploadSchedules = async (file: File, storeId: string): Promise<void
                     }
                 });
 
-                const newSchedules: Omit<DbSchedule, 'id'>[] = [];
-
-                // Get existing schedules to check for duplicates
-                const { data: existingSchedules } = await supabase
-                    .from('schedules')
-                    .select('name, date, store_id');
+                const existingSchedules = getStorage<Schedule[]>('alba_schedules', []);
+                const newSchedules: Schedule[] = [];
 
                 for (let i = 1; i < lines.length; i++) {
                     const cols = lines[i].split(",").map(c => c.trim());
@@ -163,18 +166,18 @@ export const uploadSchedules = async (file: File, storeId: string): Promise<void
                                     return `${String(hours).padStart(2, '0')}:${String(Math.round(minutes)).padStart(2, '0')}`;
                                 };
 
-                                // Check for duplicate
-                                const isDuplicate = existingSchedules?.some(
-                                    s => s.name === name && s.date === dateMap[colIdx] && s.store_id === storeId
+                                const isDuplicate = existingSchedules.some(
+                                    s => s.name === name && s.date === dateMap[colIdx] && s.storeId === storeId
                                 );
 
                                 if (!isDuplicate) {
                                     newSchedules.push({
+                                        id: Math.random().toString(36).substr(2, 9),
                                         name: name,
                                         date: dateMap[colIdx],
-                                        start_time: formatTime(startDisplay),
-                                        end_time: formatTime(endDisplay),
-                                        store_id: storeId as 'store1' | 'store2'
+                                        start: formatTime(startDisplay),
+                                        end: formatTime(endDisplay),
+                                        storeId: storeId
                                     });
                                 }
                             }
@@ -183,14 +186,7 @@ export const uploadSchedules = async (file: File, storeId: string): Promise<void
                 }
 
                 if (newSchedules.length > 0) {
-                    const { error } = await supabase
-                        .from('schedules')
-                        .insert(newSchedules);
-
-                    if (error) {
-                        reject(error.message);
-                        return;
-                    }
+                    setStorage('alba_schedules', [...existingSchedules, ...newSchedules]);
                 }
 
                 resolve();
@@ -216,69 +212,34 @@ export interface Notice {
 }
 
 export const getNotices = async (storeId?: string): Promise<Notice[]> => {
-    let query = supabase
-        .from('notices')
-        .select('*')
-        .order('created_at', { ascending: false });
+    let notices = getStorage<Notice[]>('alba_notices', []);
 
     if (storeId) {
-        query = query.or(`store_id.eq.${storeId},store_id.eq.all`);
+        notices = notices.filter(n => n.storeId === storeId || n.storeId === 'both' || n.storeId === 'all');
     }
 
-    const { data, error } = await query;
-
-    if (error) throw error;
-
-    return (data || []).map((n: DbNotice) => ({
-        id: n.id,
-        title: n.title,
-        content: n.content,
-        author: n.author,
-        storeId: n.store_id,
-        priority: n.priority,
-        imageUrls: n.image_urls || [],
-        createdAt: n.created_at
-    }));
+    return notices.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 };
 
 export const createNotice = async (notice: Omit<Notice, 'id' | 'createdAt'>): Promise<Notice> => {
-    const { data, error } = await supabase
-        .from('notices')
-        .insert({
-            title: notice.title,
-            content: notice.content,
-            author: notice.author,
-            store_id: notice.storeId,
-            priority: notice.priority,
-            image_urls: notice.imageUrls || []
-        })
-        .select()
-        .single();
-
-    if (error) throw error;
-
-    return {
-        id: data.id,
-        title: data.title,
-        content: data.content,
-        author: data.author,
-        storeId: data.store_id,
-        priority: data.priority,
-        imageUrls: data.image_urls || [],
-        createdAt: data.created_at
+    const notices = getStorage<Notice[]>('alba_notices', []);
+    const newNotice: Notice = {
+        ...notice,
+        id: Math.random().toString(36).substr(2, 9),
+        createdAt: new Date().toISOString()
     };
+    notices.unshift(newNotice);
+    setStorage('alba_notices', notices);
+    return newNotice;
 };
 
 export const deleteNotice = async (noticeId: string) => {
-    const { error } = await supabase
-        .from('notices')
-        .delete()
-        .eq('id', noticeId);
-
-    if (error) throw error;
+    let notices = getStorage<Notice[]>('alba_notices', []);
+    notices = notices.filter(n => n.id !== noticeId);
+    setStorage('alba_notices', notices);
 };
 
-// ============ Schedule Comments (using notices for now) ============
+// ============ Schedule Comments ============
 export interface ScheduleComment {
     id: string;
     storeId: string;
@@ -287,62 +248,46 @@ export interface ScheduleComment {
     createdAt: string;
 }
 
-// Using a simple local array for comments (can be extended to Supabase table if needed)
-let scheduleComments: ScheduleComment[] = [];
-
 export const getScheduleComments = async (storeId: string): Promise<ScheduleComment[]> => {
-    return scheduleComments.filter(c => c.storeId === storeId);
+    const comments = getStorage<ScheduleComment[]>('alba_comments', []);
+    return comments.filter(c => c.storeId === storeId).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 };
 
 export const addScheduleComment = async (comment: Omit<ScheduleComment, 'id' | 'createdAt'>): Promise<ScheduleComment> => {
+    const comments = getStorage<ScheduleComment[]>('alba_comments', []);
     const newComment: ScheduleComment = {
         ...comment,
         id: Math.random().toString(36).substr(2, 9),
         createdAt: new Date().toISOString()
     };
-    scheduleComments = [newComment, ...scheduleComments];
+    comments.unshift(newComment);
+    setStorage('alba_comments', comments);
     return newComment;
 };
 
 // ============ Export Functions ============
 export const exportLogsZip = async (startDate: string, endDate: string): Promise<Blob> => {
-    const { data, error } = await supabase
-        .from('work_logs')
-        .select('*')
-        .gte('date', startDate)
-        .lte('date', endDate)
-        .order('date', { ascending: true });
+    const logs = getStorage<WorkLog[]>('alba_work_logs', []);
+    const filtered = logs.filter(l => l.date >= startDate && l.date <= endDate).sort((a, b) => a.date.localeCompare(b.date));
 
-    if (error) throw error;
-
-    // Create CSV content
     let csvContent = "날짜,이름,시작시간,종료시간,휴게시간(분)\n";
-    (data || []).forEach((log: DbWorkLog) => {
-        csvContent += `${log.date},${log.user_name},${log.start_time},${log.end_time},${log.break_duration}\n`;
+    filtered.forEach((log) => {
+        csvContent += `${log.date},${log.userName},${log.start},${log.end},${log.breakDuration || 0}\n`;
     });
 
-    // Create blob
     const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
     return blob;
 };
 
 // ============ Image Upload ============
 export const uploadImage = async (file: File): Promise<string> => {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
-    const filePath = `notices/${fileName}`;
-
-    const { error } = await supabase.storage
-        .from('images')
-        .upload(filePath, file);
-
-    if (error) throw error;
-
-    const { data } = supabase.storage
-        .from('images')
-        .getPublicUrl(filePath);
-
-    return data.publicUrl;
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            resolve(e.target?.result as string); // Save as Base64 in local storage
+        };
+        reader.readAsDataURL(file);
+    });
 };
 
 export const uploadImages = async (files: File[]): Promise<string[]> => {

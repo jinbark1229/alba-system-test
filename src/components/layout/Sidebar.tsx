@@ -1,6 +1,6 @@
 // src/components/layout/Sidebar.tsx
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 interface NavItem {
@@ -26,20 +26,15 @@ const adminItems: NavItem[] = [
 ];
 
 export default function Sidebar() {
-    const { user, logout } = useAuth();
+    const { user } = useAuth();
     const location = useLocation();
-    const navigate = useNavigate();
-
-    const handleLogout = () => {
-        logout();
-        navigate("/login");
-    };
 
     const isActive = (path: string) => location.pathname === path;
 
     const canAccess = (item: NavItem) => {
         if (!item.roles) return true;
         if (!user) return false;
+        if (user.role === 'admin') return true;
         return item.roles.includes(user.role);
     };
 
@@ -134,23 +129,7 @@ export default function Sidebar() {
                     </nav>
                 </div>
 
-                {/* Footer/Logout */}
-                <div className="px-2">
-                    <button
-                        onClick={handleLogout}
-                        className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 group transition-colors"
-                    >
-                        <span
-                            className="material-symbols-outlined text-slate-400 group-hover:text-red-500 transition-colors"
-                            style={{ fontSize: "24px" }}
-                        >
-                            logout
-                        </span>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm font-medium leading-normal group-hover:text-red-500 transition-colors">
-                            로그아웃
-                        </p>
-                    </button>
-                </div>
+
             </div>
         </aside>
     );
@@ -158,27 +137,33 @@ export default function Sidebar() {
 
 // Mobile Bottom Navigation
 export function MobileNav() {
-    const { user, logout } = useAuth();
+    const { user } = useAuth();
     const location = useLocation();
-    const navigate = useNavigate();
 
     const isActive = (path: string) => location.pathname === path;
 
     const canAccess = (item: NavItem) => {
         if (!item.roles) return true;
         if (!user) return false;
+        if (user.role === 'admin') return true;
         return item.roles.includes(user.role);
     };
 
-    const handleLogout = () => {
-        logout();
-        navigate("/login");
-    };
 
     // Combine nav items for mobile - different order for boss
-    const isBoss = user?.role === 'boss' || user?.role === 'admin';
+    const isAdmin = user?.role === 'admin';
+    const isBoss = user?.role === 'boss';
 
-    const mobileNavItems: NavItem[] = isBoss ? [
+    const mobileNavItems: NavItem[] = isAdmin ? [
+        { path: "/", icon: "home", label: "홈" },
+        { path: "/daily-log", icon: "edit_note", label: "근무일지" },
+        { path: "/schedule", icon: "calendar_month", label: "일정" },
+        { path: "/salary", icon: "attach_money", label: "급여" },
+        { path: "/notices", icon: "campaign", label: "공지" },
+        { path: "/admin/export", icon: "download", label: "내보내기" },
+        { path: "/admin/allowed-names", icon: "person_add", label: "허용관리" },
+        { path: "/admin/users", icon: "group", label: "사용자" },
+    ].filter(canAccess) : isBoss ? [
         // Boss main items
         { path: "/", icon: "home", label: "홈" },
         { path: "/schedule", icon: "calendar_month", label: "일정", roles: ["boss"] },
@@ -233,13 +218,7 @@ export function MobileNav() {
                             <span className="material-symbols-outlined text-xl">settings</span>
                             <span className="text-xs font-medium">설정</span>
                         </Link>
-                        <button
-                            onClick={handleLogout}
-                            className="flex flex-col items-center gap-1 py-2 rounded-lg text-red-500"
-                        >
-                            <span className="material-symbols-outlined text-xl">logout</span>
-                            <span className="text-xs font-medium">로그아웃</span>
-                        </button>
+
                     </div>
                 </div>
             )}

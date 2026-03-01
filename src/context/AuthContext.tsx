@@ -1,7 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 // src/context/AuthContext.tsx
 import { createContext, useState, useEffect, type ReactNode } from "react";
-import { supabase, type DbUser, type DbAllowedName } from "../lib/supabase";
 
 interface User {
     id: string;
@@ -42,10 +41,33 @@ interface AuthContextProps {
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
+// Helper function to safely parse localStorage
+const getStorage = <T,>(key: string, defaultValue: T): T => {
+    try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : defaultValue;
+    } catch {
+        return defaultValue;
+    }
+};
+
+const setStorage = <T,>(key: string, value: T) => {
+    localStorage.setItem(key, JSON.stringify(value));
+};
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(() => {
         const stored = localStorage.getItem("authUser");
-        return stored ? JSON.parse(stored) : null;
+        if (stored) return JSON.parse(stored);
+
+        // 방문자를 위한 임시 계정 (모든 권한 허용) - 포트폴리오용
+        return {
+            id: "guest-viewer",
+            name: "방문자(포트폴리오용)",
+            role: "admin",
+            storeId: "both",
+            token: "guest-token"
+        };
     });
 
     const [users, setUsers] = useState<User[]>([]);
@@ -64,46 +86,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return code;
     };
 
-    // Load data from Supabase on mount
+    // Initialize mock data for portfolio
+    const initMockData = () => {
+        if (!localStorage.getItem('alba_users')) {
+            setStorage('alba_users', [
+                { id: 'u1', name: '사장님', password: 'password123', role: 'boss', storeId: 'both', token: 'token-u1' },
+                { id: 'u2', name: '김철수', password: 'password123', role: 'worker', storeId: 'store1', token: 'token-u2' },
+                { id: 'u3', name: '이영희', password: 'password123', role: 'manager', storeId: 'store2', token: 'token-u3' }
+            ]);
+        }
+        if (!localStorage.getItem('alba_allowed_names')) {
+            setStorage('alba_allowed_names', [
+                { name: '사장님', role: 'boss', storeId: 'both', addedAt: new Date().toISOString().slice(0, 10), registrationCode: 'AUTHOR_BOSS_CODE' },
+                { name: '김철수', role: 'worker', storeId: 'store1', addedAt: new Date().toISOString().slice(0, 10), registrationCode: generateCode() },
+                { name: '이영희', role: 'manager', storeId: 'store2', addedAt: new Date().toISOString().slice(0, 10), registrationCode: generateCode() }
+            ]);
+        }
+    };
+
+    // Load data from LocalStorage on mount
     useEffect(() => {
         const loadData = async () => {
             setIsLoading(true);
             try {
-                // Load users
-                const { data: usersData, error: usersError } = await supabase
-                    .from('users')
-                    .select('*');
+                initMockData();
+                const localUsers = getStorage<User[]>('alba_users', []);
+                setUsers(localUsers);
 
-                if (usersError) throw usersError;
-
-                const mappedUsers: User[] = (usersData || []).map((u: DbUser) => ({
-                    id: u.id,
-                    name: u.name,
-                    password: u.password,
-                    role: u.role,
-                    storeId: u.store_id || undefined,
-                    token: `token-${u.id}`
-                }));
-                setUsers(mappedUsers);
-
-                // Load allowed names
-                const { data: allowedData, error: allowedError } = await supabase
-                    .from('allowed_names')
-                    .select('*');
-
-                if (allowedError) throw allowedError;
-
-                const mappedAllowed: AllowedName[] = (allowedData || []).map((a: DbAllowedName) => ({
-                    name: a.name,
-                    role: a.role,
-                    storeId: a.store_id,
-                    addedAt: a.added_at,
-                    registrationCode: a.registration_code
-                }));
-                setAllowedNames(mappedAllowed);
-
+                const localAllowed = getStorage<AllowedName[]>('alba_allowed_names', []);
+                setAllowedNames(localAllowed);
             } catch (error) {
-                console.error('Error loading data from Supabase:', error);
+                console.error('Error loading data from LocalStorage:', error);
             } finally {
                 setIsLoading(false);
             }
@@ -124,8 +137,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const withdraw = async () => {
         if (!user) return;
-        await supabase.from('users').delete().eq('id', user.id);
-        setUsers(users.filter(u => u.id !== user.id));
+        const newUsers = users.filter(u => u.id !== user.id);
+        setStorage('alba_users', newUsers);
+        setUsers(newUsers);
         logout();
     };
 
@@ -147,48 +161,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             return { success: false, message: "새 비밀번호는 4자리 이상이어야 합니다." };
         }
 
-        const { error } = await supabase
-            .from('users')
-            .update({ password: newPwd })
-            .eq('id', user.id);
+        const updatedUsers = users.map(u => u.id === user.id ? { ...u, password: newPwd } : u);
+        setStorage('alba_users', updatedUsers);
+        setUsers(updatedUsers);
 
-        if (error) {
-            return { success: false, message: "비밀번호 변경 중 오류가 발생했습니다." };
-        }
-
-        setUsers(users.map(u => u.id === user.id ? { ...u, password: newPwd } : u));
         return { success: true, message: "비밀번호가 성공적으로 변경되었습니다." };
     };
 
     const addUser = async (newUser: Omit<User, "id">): Promise<User> => {
-        const { data, error } = await supabase
-            .from('users')
-            .insert({
-                name: newUser.name,
-                password: newUser.password || '',
-                role: newUser.role,
-                store_id: newUser.storeId || null
-            })
-            .select()
-            .single();
-
-        if (error) throw error;
-
         const userWithId: User = {
-            id: data.id,
-            name: data.name,
-            password: data.password,
-            role: data.role,
-            storeId: data.store_id,
-            token: `token-${data.id}`
+            ...newUser,
+            id: Math.random().toString(36).substr(2, 9),
+            token: `token-${Date.now()}`
         };
-        setUsers([...users, userWithId]);
+        const updatedUsers = [...users, userWithId];
+        setStorage('alba_users', updatedUsers);
+        setUsers(updatedUsers);
         return userWithId;
     };
 
     const removeUser = async (userId: string) => {
-        await supabase.from('users').delete().eq('id', userId);
-        setUsers(users.filter(u => u.id !== userId));
+        const updatedUsers = users.filter(u => u.id !== userId);
+        setStorage('alba_users', updatedUsers);
+        setUsers(updatedUsers);
     };
 
     const listUsers = () => users;
@@ -201,20 +196,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const codeLength = role === "boss" ? 16 : 12;
         const newCode = generateCode(codeLength);
 
-        const { error } = await supabase
-            .from('allowed_names')
-            .insert({
-                name,
-                role,
-                store_id: storeId,
-                registration_code: newCode
-            });
-
-        if (error) {
-            console.error('Error adding allowed name:', error);
-            return { success: false };
-        }
-
         const newAllowed: AllowedName = {
             name,
             role,
@@ -222,15 +203,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             addedAt: new Date().toISOString().slice(0, 10),
             registrationCode: newCode
         };
-        setAllowedNames([...allowedNames, newAllowed]);
+        const updatedAllowed = [...allowedNames, newAllowed];
+        setStorage('alba_allowed_names', updatedAllowed);
+        setAllowedNames(updatedAllowed);
         return { success: true, code: newCode };
     };
 
     const removeAllowedName = async (name: string) => {
-        await supabase.from('allowed_names').delete().eq('name', name);
-        await supabase.from('users').delete().eq('name', name);
-        setAllowedNames(allowedNames.filter(a => a.name !== name));
-        setUsers(users.filter(u => u.name !== name));
+        const updatedAllowed = allowedNames.filter(a => a.name !== name);
+        const updatedUsers = users.filter(u => u.name !== name);
+
+        setStorage('alba_allowed_names', updatedAllowed);
+        setStorage('alba_users', updatedUsers);
+
+        setAllowedNames(updatedAllowed);
+        setUsers(updatedUsers);
     };
 
     const getAllowedNames = () => allowedNames;
@@ -248,16 +235,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const codeLength = entry.role === "boss" ? 16 : 12;
         const newCode = generateCode(codeLength);
 
-        const { error } = await supabase
-            .from('allowed_names')
-            .update({ registration_code: newCode })
-            .eq('name', name);
-
-        if (error) return null;
-
-        setAllowedNames(allowedNames.map(a =>
+        const updatedAllowed = allowedNames.map(a =>
             a.name === name ? { ...a, registrationCode: newCode } : a
-        ));
+        );
+
+        setStorage('alba_allowed_names', updatedAllowed);
+        setAllowedNames(updatedAllowed);
         return newCode;
     };
 

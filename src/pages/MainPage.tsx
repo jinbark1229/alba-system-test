@@ -9,41 +9,22 @@ export default function MainPage() {
     if (user) {
         return (
             <MainLayout title="홈" description={`${user.name}님, 오늘도 좋은 하루 되세요!`}>
-                {/* Dashboard Widgets */}
+                {/* Dashboard Widgets (All Exposed for Portfolio) */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {/* Worker: Daily Log Widget */}
-                    {user.role === "worker" && (
-                        <div className="bg-white dark:bg-[#1e2936] p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow">
-                            <div className="flex items-center gap-3 mb-4 text-emerald-500">
-                                <span className="material-symbols-outlined text-3xl">edit_note</span>
-                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">근무 일지</h3>
-                            </div>
-                            <p className="text-slate-500 dark:text-slate-400 mb-4 text-sm">
-                                오늘 근무한 내용을 기록하세요.<br />
-                                급여 계산의 기준이 됩니다.
-                            </p>
-                            <Link to="/daily-log" className="text-emerald-500 font-medium hover:underline text-sm inline-flex items-center gap-1">
-                                일지 작성 <span className="material-symbols-outlined text-lg">arrow_forward</span>
-                            </Link>
+                    <div className="bg-white dark:bg-[#1e2936] p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow">
+                        <div className="flex items-center gap-3 mb-4 text-emerald-500">
+                            <span className="material-symbols-outlined text-3xl">edit_note</span>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white">근무 일지</h3>
                         </div>
-                    )}
-
-                    {/* Boss/Admin: Data Export Widget */}
-                    {(user.role === "boss" || user.role === "admin") && (
-                        <div className="bg-white dark:bg-[#1e2936] p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow">
-                            <div className="flex items-center gap-3 mb-4 text-blue-500">
-                                <span className="material-symbols-outlined text-3xl">download</span>
-                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">데이터 내보내기</h3>
-                            </div>
-                            <p className="text-slate-500 dark:text-slate-400 mb-4 text-sm">
-                                근무 기록과 급여 내역을<br />
-                                엑셀/CSV 파일로 다운로드합니다.
-                            </p>
-                            <Link to="/admin/export" className="text-blue-500 font-medium hover:underline text-sm inline-flex items-center gap-1">
-                                내보내기 <span className="material-symbols-outlined text-lg">arrow_forward</span>
-                            </Link>
-                        </div>
-                    )}
+                        <p className="text-slate-500 dark:text-slate-400 mb-4 text-sm">
+                            오늘 근무한 내용을 기록하세요.<br />
+                            급여 계산의 기준이 됩니다.
+                        </p>
+                        <Link to="/daily-log" className="text-emerald-500 font-medium hover:underline text-sm inline-flex items-center gap-1">
+                            일지 작성 <span className="material-symbols-outlined text-lg">arrow_forward</span>
+                        </Link>
+                    </div>
 
                     {/* Schedule Widget */}
                     <div className="bg-white dark:bg-[#1e2936] p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow">
@@ -60,6 +41,21 @@ export default function MainPage() {
                         </Link>
                     </div>
 
+                    {/* Salary Calculator Widget */}
+                    <div className="bg-white dark:bg-[#1e2936] p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow">
+                        <div className="flex items-center gap-3 mb-4 text-green-500">
+                            <span className="material-symbols-outlined text-3xl">attach_money</span>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white">급여 계산</h3>
+                        </div>
+                        <p className="text-slate-500 dark:text-slate-400 mb-4 text-sm">
+                            이번 달 근무 기록을 바탕으로<br />
+                            예상 월급을 계산합니다.
+                        </p>
+                        <Link to="/salary" className="text-green-500 font-medium hover:underline text-sm inline-flex items-center gap-1">
+                            급여 확인 <span className="material-symbols-outlined text-lg">arrow_forward</span>
+                        </Link>
+                    </div>
+
                     {/* Notice Widget */}
                     <div className="bg-white dark:bg-[#1e2936] p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow">
                         <div className="flex items-center gap-3 mb-4 text-amber-500">
@@ -72,6 +68,51 @@ export default function MainPage() {
                         </p>
                         <Link to="/notices" className="text-amber-500 font-medium hover:underline text-sm inline-flex items-center gap-1">
                             공지 확인 <span className="material-symbols-outlined text-lg">arrow_forward</span>
+                        </Link>
+                    </div>
+
+                    {/* Boss/Admin: Data Export Widget */}
+                    <div className="bg-white dark:bg-[#1e2936] p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow">
+                        <div className="flex items-center gap-3 mb-4 text-blue-500">
+                            <span className="material-symbols-outlined text-3xl">download</span>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white">데이터 내보내기</h3>
+                        </div>
+                        <p className="text-slate-500 dark:text-slate-400 mb-4 text-sm">
+                            근무 기록과 급여 내역을<br />
+                            엑셀/CSV 파일로 다운로드합니다.
+                        </p>
+                        <Link to="/admin/export" className="text-blue-500 font-medium hover:underline text-sm inline-flex items-center gap-1">
+                            내보내기 <span className="material-symbols-outlined text-lg">arrow_forward</span>
+                        </Link>
+                    </div>
+
+                    {/* Boss: User Management Widget */}
+                    <div className="bg-white dark:bg-[#1e2936] p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow">
+                        <div className="flex items-center gap-3 mb-4 text-purple-500">
+                            <span className="material-symbols-outlined text-3xl">group</span>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white">사용자 관리</h3>
+                        </div>
+                        <p className="text-slate-500 dark:text-slate-400 mb-4 text-sm">
+                            가입된 직원 목록을 확인하고<br />
+                            권한을 관리합니다.
+                        </p>
+                        <Link to="/admin/users" className="text-purple-500 font-medium hover:underline text-sm inline-flex items-center gap-1">
+                            사용자 관리 <span className="material-symbols-outlined text-lg">arrow_forward</span>
+                        </Link>
+                    </div>
+
+                    {/* Boss: Allowed Names Widget */}
+                    <div className="bg-white dark:bg-[#1e2936] p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow">
+                        <div className="flex items-center gap-3 mb-4 text-rose-500">
+                            <span className="material-symbols-outlined text-3xl">verified_user</span>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white">허용 이름 관리</h3>
+                        </div>
+                        <p className="text-slate-500 dark:text-slate-400 mb-4 text-sm">
+                            사전에 승인된 직원 이름과<br />
+                            가입 코드를 발급합니다.
+                        </p>
+                        <Link to="/admin/allowed-names" className="text-rose-500 font-medium hover:underline text-sm inline-flex items-center gap-1">
+                            이름 관리 <span className="material-symbols-outlined text-lg">arrow_forward</span>
                         </Link>
                     </div>
                 </div>

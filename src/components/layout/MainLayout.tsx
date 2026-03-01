@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+
 import { type ReactNode } from "react";
 import { useAuth } from "../../context/AuthContext";
 import Sidebar, { MobileNav } from "./Sidebar";
@@ -11,13 +11,7 @@ interface MainLayoutProps {
 }
 
 export default function MainLayout({ children, title, description, breadcrumbs }: MainLayoutProps) {
-    const { user, logout } = useAuth();
-    const navigate = useNavigate();
-
-    const handleLogout = () => {
-        logout();
-        navigate("/login");
-    };
+    const { user } = useAuth();
 
     // Show simplified layout for non-logged-in users
     if (!user) {
@@ -80,14 +74,7 @@ export default function MainLayout({ children, title, description, breadcrumbs }
                                 <span className="text-sm font-bold text-slate-900 dark:text-white">{user?.name}</span>
                                 <span className="text-xs text-slate-500">{user?.role === 'boss' ? '사장님' : user?.role === 'admin' ? '관리자' : '알바생'}</span>
                             </div>
-                            <button
-                                onClick={handleLogout}
-                                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-600 dark:text-slate-300 hover:text-red-500 transition-all shadow-sm"
-                                title="로그아웃"
-                            >
-                                <span className="material-symbols-outlined text-lg">logout</span>
-                                <span className="text-sm font-bold hidden sm:inline">로그아웃</span>
-                            </button>
+
                         </div>
                     </div>
                 </header>

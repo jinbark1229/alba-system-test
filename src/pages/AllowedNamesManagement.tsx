@@ -12,8 +12,8 @@ export default function AllowedNamesManagement() {
     const [newRole, setNewRole] = useState<"worker" | "manager" | "boss">("worker");
     const [newStoreId, setNewStoreId] = useState<"store1" | "store2" | "both">("store1");
 
-    // Guard: only boss can access (직원 역할 부여는 사장님만 가능)
-    if (!user || user.role !== "boss") {
+    // Guard: only boss or admin can access (직원 역할 부여는 사장님만 가능)
+    if (!user || (user.role !== "boss" && user.role !== "admin")) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen bg-background-light dark:bg-background-dark p-4">
                 <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">접근 권한이 없습니다.</h2>
