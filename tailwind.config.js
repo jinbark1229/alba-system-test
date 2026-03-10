@@ -13,7 +13,7 @@ export default {
                 "background-dark": "#101922",
             },
             fontFamily: {
-                "display": ["Inter", "Noto Sans KR", "sans-serif"],
+                "display": ["system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
             },
             borderRadius: {
                 "DEFAULT": "0.25rem",

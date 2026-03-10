@@ -265,18 +265,45 @@ export const addScheduleComment = async (comment: Omit<ScheduleComment, 'id' | '
     return newComment;
 };
 
+export const deleteScheduleComment = async (commentId: string): Promise<void> => {
+    let comments = getStorage<ScheduleComment[]>('alba_comments', []);
+    comments = comments.filter(c => c.id !== commentId);
+    setStorage('alba_comments', comments);
+};
+
 // ============ Export Functions ============
 export const exportLogsZip = async (startDate: string, endDate: string): Promise<Blob> => {
+    const JSZip = (await import('jszip')).default;
     const logs = getStorage<WorkLog[]>('alba_work_logs', []);
-    const filtered = logs.filter(l => l.date >= startDate && l.date <= endDate).sort((a, b) => a.date.localeCompare(b.date));
+    const filtered = logs
+        .filter(l => l.date >= startDate && l.date <= endDate)
+        .sort((a, b) => a.date.localeCompare(b.date));
 
-    let csvContent = "날짜,이름,시작시간,종료시간,휴게시간(분)\n";
-    filtered.forEach((log) => {
-        csvContent += `${log.date},${log.userName},${log.start},${log.end},${log.breakDuration || 0}\n`;
+    // Group by userName
+    const byUser: Record<string, WorkLog[]> = {};
+    filtered.forEach(log => {
+        const name = log.userName || '알수없음';
+        if (!byUser[name]) byUser[name] = [];
+        byUser[name].push(log);
     });
 
-    const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
-    return blob;
+    const zip = new JSZip();
+
+    if (Object.keys(byUser).length === 0) {
+        // Empty zip with a readme
+        zip.file('README.txt', `${startDate} ~ ${endDate} 기간에 근무 기록이 없습니다.`);
+    } else {
+        Object.entries(byUser).forEach(([userName, userLogs]) => {
+            const BOM = '\uFEFF';
+            let csv = BOM + '날짜,이름,시작시간,종료시간,휴게여부,휴게시간(분),특이사항\n';
+            userLogs.forEach(log => {
+                csv += `${log.date},${log.userName},${log.start},${log.end},${log.break ? '있음' : '없음'},${log.breakDuration || 0},${log.note || ''}\n`;
+            });
+            zip.file(`${userName}_근무일지.csv`, csv);
+        });
+    }
+
+    return await zip.generateAsync({ type: 'blob', mimeType: 'application/zip' });
 };
 
 // ============ Image Upload ============

@@ -11,6 +11,7 @@ export default function SchedulePage() {
     const { user } = useAuth();
     const isBossOrAdmin = user?.role === 'boss' || user?.role === 'admin';
     const [viewMode, setViewMode] = useState<'calendar' | 'table'>('table');
+    const [commentStore, setCommentStore] = useState<'store1' | 'store2'>('store1');
 
     return (
         <MainLayout
@@ -68,9 +69,30 @@ export default function SchedulePage() {
                     </div>
                 )}
 
-                {/* Comments */}
+                {/* Comments - with store tab selector */}
                 <div className="bg-white dark:bg-[#1e2936] rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
-                    <ScheduleComments storeId="store1" />
+                    {/* Store Tab */}
+                    <div className="flex gap-2 mb-4">
+                        <button
+                            onClick={() => setCommentStore('store1')}
+                            className={`px-3 py-1.5 rounded-lg text-sm font-bold transition-all ${commentStore === 'store1'
+                                ? "bg-primary text-white"
+                                : "bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-primary"
+                                }`}
+                        >
+                            연산점
+                        </button>
+                        <button
+                            onClick={() => setCommentStore('store2')}
+                            className={`px-3 py-1.5 rounded-lg text-sm font-bold transition-all ${commentStore === 'store2'
+                                ? "bg-primary text-white"
+                                : "bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-primary"
+                                }`}
+                        >
+                            부전점
+                        </button>
+                    </div>
+                    <ScheduleComments storeId={commentStore} />
                 </div>
             </div>
         </MainLayout>
